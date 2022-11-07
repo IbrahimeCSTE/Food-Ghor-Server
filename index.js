@@ -35,14 +35,35 @@ async function run() {
   try {
     const userCollection = client.db("foodghor").collection("user");
 
-    //user post router
-    app.post("/api/user", async (req, res) => {
-      const user = req.body;
-      const result = await userCollection.insertOne(user);
-      res.send("Registration Successfully");
-      console.log(result);
+    //user post register router
+    app.post("/api/user/register", async (req, res) => {
+      const alreadyUser = await userCollection.findOne({
+        email: req.body.email,
+      });
+      if (alreadyUser) {
+        res.status(200).send("User already registed");
+      } else {
+        const user = req.body;
+        await userCollection.insertOne(user);
+        res.status(200).send("Registration Successfully");
+        // console.log(result);
+      }
     });
-    //user get router
+    //user post login router
+    app.post("/api/user/login", async (req, res) => {
+      //const alreadyUser = req.body.email;
+      const alreadyUser = await userCollection.findOne({
+        email: req.body.email,
+      });
+      if (!alreadyUser) {
+        res.status(200).send("Email isn't registed");
+      } else {
+        res.send(alreadyUser);
+      }
+
+      //console.log(alreadyUser);
+    });
+    //user get all register router
     app.get("/api/user", async (req, res) => {
       const result = await userCollection.find({}).toArray();
       res.status(200).send(result);
