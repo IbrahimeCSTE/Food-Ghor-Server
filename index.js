@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
+const jwt = require("jsonwebtoken");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const verifyJwt = require("./jwt");
 require("dotenv").config();
 // middle wares
 const app = express();
@@ -37,12 +39,22 @@ async function run() {
       } else {
         const user = req.body;
         await userCollection.insertOne(user);
-        res.status(200).send("Registration Successfully");
+        const payload = {
+          user: {
+            id: user.email,
+          },
+        };
+        const token = jwt.sign(payload, process.env.JWT_SECRETE, {
+          expiresIn: 36000,
+        });
+        res
+          .status(200)
+          .send({ msg: "Registration Successfully", token: token });
         // console.log(result);
       }
     });
     //user post login router
-    app.post("/api/user/login", async (req, res) => {
+    app.post("/api/user/login", verifyJwt, async (req, res) => {
       //const alreadyUser = req.body.email;
       const alreadyUser = await userCollection.findOne({
         email: req.body.email,
