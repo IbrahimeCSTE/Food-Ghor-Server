@@ -35,6 +35,7 @@ async function run() {
   try {
     const userCollection = client.db("foodghor").collection("user");
     const foodCollection = client.db("foodghor").collection("food");
+    const reviewCollection = client.db("foodghor").collection("review");
 
     //user post register router
     app.post("/api/user/register", async (req, res) => {
@@ -90,6 +91,20 @@ async function run() {
         _id: ObjectId(foodId),
       });
       res.status(200).send(singleFoot);
+      // console.log(result);
+    });
+
+    //review post api
+    app.post("/api/review", async (req, res) => {
+      const review = req.body;
+      await reviewCollection.insertOne(review);
+      res.status(200).send("review added");
+      // console.log(result);
+    });
+    //review get api
+    app.get("/api/review", async (req, res) => {
+      const review = await reviewCollection.find({}).toArray();
+      res.status(200).send(review);
       // console.log(result);
     });
 
