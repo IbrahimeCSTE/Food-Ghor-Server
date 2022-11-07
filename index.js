@@ -30,15 +30,22 @@ const client = new MongoClient(
   }
 );
 
+//router function
 async function run() {
   try {
     const userCollection = client.db("foodghor").collection("user");
-    //router
+
+    //user post router
     app.post("/api/user", async (req, res) => {
       const user = req.body;
       const result = await userCollection.insertOne(user);
       res.send("Registration Successfully");
       console.log(result);
+    });
+    //user get router
+    app.get("/api/user", async (req, res) => {
+      const result = await userCollection.find({}).toArray();
+      res.status(200).send(result);
     });
 
     app.get("/", (req, res) => {
