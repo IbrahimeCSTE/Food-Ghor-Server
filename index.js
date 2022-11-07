@@ -14,21 +14,11 @@ const PORT = process.env.PORT || 5000;
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.tfzr2.mongodb.net/${process.env.DB_Name}?retryWrites=true&w=majority`;
 
-const client = new MongoClient(
-  uri,
-  function (err, db) {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log("Database created!");
-    }
-  },
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    serverApi: ServerApiVersion.v1,
-  }
-);
+const client = new MongoClient(uri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  serverApi: ServerApiVersion.v1,
+});
 
 //router function
 async function run() {
@@ -106,6 +96,24 @@ async function run() {
       const review = await reviewCollection.find({}).toArray();
       res.status(200).send(review);
       // console.log(result);
+    });
+    //review delete api
+    app.delete("/api/review/:id", async (req, res) => {
+      const id = req.params.id;
+      await reviewCollection.deleteOne({ _id: ObjectId(id) });
+      res.status(200).send("review deleted");
+    });
+    //review edit api
+    app.patch("/api/review/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const updatedReview = {
+        $set: {
+          review: req.body.review,
+        },
+      };
+      await reviewCollection.updateOne(query, updatedReview);
+      res.status(200).send("updeted");
     });
 
     //test api
