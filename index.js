@@ -34,6 +34,7 @@ const client = new MongoClient(
 async function run() {
   try {
     const userCollection = client.db("foodghor").collection("user");
+    const foodCollection = client.db("foodghor").collection("food");
 
     //user post register router
     app.post("/api/user/register", async (req, res) => {
@@ -69,6 +70,30 @@ async function run() {
       res.status(200).send(result);
     });
 
+    //food post section
+    app.post("/api/food", async (req, res) => {
+      const food = req.body;
+      await foodCollection.insertOne(food);
+      res.status(200).send("Food added");
+      // console.log(result);
+    });
+    //food get section
+    app.get("/api/food", async (req, res) => {
+      const allFoot = await foodCollection.find({}).toArray();
+      res.status(200).send(allFoot);
+      // console.log(result);
+    });
+    //single food get api
+    app.get("/api/food/:id", async (req, res) => {
+      const foodId = req.params.id;
+      const singleFoot = await foodCollection.findOne({
+        _id: ObjectId(foodId),
+      });
+      res.status(200).send(singleFoot);
+      // console.log(result);
+    });
+
+    //test api
     app.get("/", (req, res) => {
       res.status(200).send("Hi server!");
     });
