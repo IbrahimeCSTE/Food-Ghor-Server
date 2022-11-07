@@ -33,6 +33,13 @@ const client = new MongoClient(
 async function run() {
   try {
     const userCollection = client.db("foodghor").collection("user");
+    //router
+    app.post("/api/user", async (req, res) => {
+      const user = req.body;
+      const result = await userCollection.insertOne(user);
+      res.send("Registration Successfully");
+      console.log(result);
+    });
 
     app.get("/", (req, res) => {
       res.status(200).send("Hi server!");
